@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+  <title>Online PicturePlayer</title>
+  <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+  <script src="player.js"></script>
+
+  <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+  <meta content="utf-8" http-equiv="encoding">
+
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+  <div class="container">
+    <div class="page-header">
+      <h1>Online PicturePlayer</h1>
+
+
+    <select id="cameralist" size="1">
+      <option>N/A</option>
+    </select>
+
+    <label><input type="checkbox" name="reverse" id="reverse" value="" checked>Reverse</label>
+
+    <button type="button" id="playbtn" class="btn btn-primary">
+      <i class="glyphicon glyphicon-play"></i>
+    </button>
+
+    <button type="button" id="reloadbtn" class="btn btn-danger">
+      <i class="glyphicon glyphicon-repeat"></i>
+    </button>
+<!--
+    <label><input type="checkbox" name="filter"
+      id="filter" value="">Filter:</label>
+    <input type="text" id="pps"></input>
+    pictures within <input id="t" type="text"></input> seconds
+-->
+
+<label><input type="checkbox" name="startframe"
+  id="startframe-checkbox" value="">Start at frame:</label>
+  <input type="text" id="startframe"></input>
+    </div>
+
+    <h3>Selected: <span id="path">N/A</span>
+      <span class="badge" id="size">N/A</span>
+      <span class="badge" id="filecount">N/A</span>
+
+    <div class="progress">
+      <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="0"
+        aria-valuemin="0" aria-valuemax="100">
+      </div>
+    </div>
+
+    <span id="status"></span>
+    <img class="img-thumbnail" id="img-loading" src="ajax-loader.gif">
+    <img class="img-thumbnail" id="img" src="">
+
+    <div class="well details">
+      <b>File:</b> <span id="name">N/A</span> <br>
+      <b>Timestamp:</b> <span id="timestamp">N/A</span>
+    </div>
+
+    <hr>
+
+    <button type="button" id="deletebtn" class="btn btn-danger">
+      Delete Everything
+    </button>
+    <span id="msg"></span>
+    <br>
+
+  </div>
+
+  <br>
+
+</body>
+</html>

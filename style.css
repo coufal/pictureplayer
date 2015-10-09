@@ -1,0 +1,16 @@
+select option {
+  padding: 15px;
+}
+
+input[type="text"] {
+  width: 50px;
+}
+
+#img-loading {
+  display: block;
+  margin: 0 auto;
+}
+
+#img, #img-loading {
+  margin-bottom: 25px;
+}
