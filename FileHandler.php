@@ -1,5 +1,7 @@
 <?php
 
+namespace coufal\PicturePlayer;
+
 class FileHandler
 {
   private static $exclude_dirs=['tests'];
@@ -8,7 +10,7 @@ class FileHandler
   {
     $dirs = array();
 
-    foreach (new DirectoryIterator(__DIR__) as $file) {
+    foreach (new \DirectoryIterator(__DIR__) as $file) {
       if ($file->isDir() && !$file->isDot() //only dirs
       && !in_array($file->getFilename(), self::$exclude_dirs) //skip dirs on exclude list
       && $file->getFilename()[0] != '.') { //skip hidden dirs
@@ -73,8 +75,8 @@ class FileHandler
     $count = 0;
     $path = realpath($path);
     if($path!==false){
-      foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($path,
-      FilesystemIterator::SKIP_DOTS)) as $object) {
+      foreach(new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path,
+      \FilesystemIterator::SKIP_DOTS)) as $object) {
         $bytestotal += $object->getSize();
         ++$count;
       }
