@@ -53,7 +53,7 @@ function switchDir(myCam) {
   // }
 
   $.getJSON( url, function( data ) {
-    fileList = (data[0].name == null) ? [] : data ;
+    fileList = (data[0] == null) ? [] : data ;
     frame = 0;
     updateStatusBar(true);
     //$("#filecount").text(fileList.length+" Files");
@@ -192,10 +192,9 @@ function updateCameraList() {
 
     $("#cameralist").empty().append(function() {
         var output = '';
-        console.log(data.length);
-        $.each(data, function(value) {
-            output += '<option>' + value + '</option>';
-        });
+        for(var i=0; i<data.length; ++i){
+          output += '<option>' + data[i] + '</option>';
+        }
         return output;
     });
     onCamChange();

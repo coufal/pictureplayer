@@ -23,8 +23,12 @@ class FileHandler
     return json_encode($dirs);
   }
 
-  public static function ls_pictures($dir) {
-    $dir = basename($dir); //sanitize user input
+  public static function ls_pictures($uri, $dir) {
+    //sanitize user input
+    $dir = dirname($uri) . '/' . basename($dir);
+
+    //prevent errors if no timezone was set
+    date_default_timezone_set('UTC');
 
     $a = array();
     $i = 0;
@@ -37,13 +41,14 @@ class FileHandler
       $filelist = glob($dir."/*.jpg");
     }
 
-    // sort by time, newest firsts
-    //usort($filelist, create_function('$a,$b', 'return filemtime($b) - filemtime($a);'));
+    // sort by time, oldest firsts
+    usort($filelist, create_function('$a,$b', 'return filemtime($a) - filemtime($b);'));
 
     while ($i < count($filelist)) {
       $a[$i]["name"] = $filelist[$i];
       $a[$i]["timestamp"] = date("Y-m-d H:i:s", filemtime($filelist[$i]));
       ++$i;
+
     }
 
     return json_encode($a);
