@@ -2,3 +2,5 @@
 */*
 !tests/*
 tmp.php
+.htaccess
+.htpasswd
