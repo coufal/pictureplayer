@@ -53,7 +53,7 @@ function switchDir(myCam) {
   // }
 
   $.getJSON( url, function( data ) {
-    fileList = (data[0] == null) ? [] : data ;
+    fileList = (data[0].name == null) ? [] : data ;
     frame = 0;
     updateStatusBar(true);
     //$("#filecount").text(fileList.length+" Files");
@@ -120,6 +120,20 @@ function updateStatusBar(init) {
   }
 }
 
+// function play() {
+//   if (!stopped && frame < fileList.length) {
+//     if (reverse) {
+//       displayPic(fileList[fileList.length-1-frame]);
+//       updateStatusBar();
+//     } else {
+//       displayPic(fileList[frame]);
+//       updateStatusBar();
+//     }
+//     ++frame;
+//     setTimeout(play, delay);
+//   }
+// }
+
 function play() {
   if (!stopped && frame < fileList.length) {
     var pic = "";
@@ -177,6 +191,8 @@ function frwdBtn() {
 }
 
 function reloadBtn() {
+
+
   switchDir(cam);
   stopped = true;
   updateStatusBar(true);
@@ -184,19 +200,15 @@ function reloadBtn() {
 
 function updateCameraList() {
   $.getJSON( 'main.php?get=ls_cameras', function( data ) {
-    if (data.length == 0) {
-      console.log('No Cameras found.');
-      $("#img-loading").hide();
-      return;
-    }
-
     $("#cameralist").empty().append(function() {
         var output = '';
-        for(var i=0; i<data.length; ++i){
-          output += '<option>' + data[i] + '</option>';
-        }
+        $.each(data, function(key, value) {
+            output += '<option>' + value + '</option>';
+        });
         return output;
     });
+  })
+  .done(function() {
     onCamChange();
   })
   .fail(function() {
