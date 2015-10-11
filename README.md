@@ -21,7 +21,13 @@ found in a directory in successive order at arond 10 frames per second (depends 
 - Displays timestamp and filename of each frame
 
 ## Prerequisites
-``PHP 5.6`` or better
+``PHP 5.4`` or better
+
+**Note** 
+
+You can usually enable a later version of php using yout ``htaccess`` file:
+
+``AddHandler php56-cgi .php``
 
 ## Installation
 Just place all files in a directory above the one where your camera saves its images. 
