@@ -6,6 +6,27 @@ class FileHandler
 {
   private static $exclude_dirs=['tests'];
 
+  private static function sanitize_path($dir) {
+    //sanitize user input
+    $dir = basename($dir);
+    if(strcmp($dir[0], '.') == 0) {
+      throw new \RuntimeException('Path must not end or begin with a dot.');
+    }
+    return $dir;
+  }
+
+  private static function get_all_files($dir) {
+    $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
+    $filelist = array();
+    foreach ($rii as $file) {
+        if ($file->isDir()){
+            continue;
+        }
+        $filelist[] = $file->getPathname();
+    }
+    return $filelist;
+  }
+
   public static function ls_cameras()
   {
     $dirs = array();
@@ -24,36 +45,22 @@ class FileHandler
   }
 
   public static function ls_pictures($dir) {
-    //sanitize user input
-    $dir = basename($dir);
-    if(strcmp($dir[0], '.') == 0) {
-      throw new \RuntimeException('Path must not end or begin with a dot.');
-    }
+    $dir = self::sanitize_path($dir);
 
     //prevent errors if no timezone was set
     date_default_timezone_set('UTC');
 
     $a = array();
     $i = 0;
-    $k = 0;
 
-    $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
-    $filelist = array();
-    foreach ($rii as $file) {
-        if ($file->isDir()){
-            continue;
-        }
-        $k = ['display_name' => $file->getPathname(),
-              'name' => $file->getPathname()];
-        $filelist[] = $k;
-    }
+    $filelist = self::get_all_files($dir);
 
     // sort by time, oldest firsts
-    usort($filelist, create_function('$a,$b', 'return filemtime($a["name"]) - filemtime($b["name"]);'));
+    usort($filelist, create_function('$a,$b', 'return filemtime($a) - filemtime($b);'));
 
     while ($i < count($filelist)) {
-      $a[$i]["name"] = $filelist[$i]["display_name"];
-      $a[$i]["timestamp"] = date("Y-m-d H:i:s", filemtime($filelist[$i]["name"]));
+      $a[$i]["name"] = $filelist[$i];
+      $a[$i]["timestamp"] = date("Y-m-d H:i:s", filemtime($filelist[$i]));
       ++$i;
 
     }
@@ -62,27 +69,23 @@ class FileHandler
   }
 
   public static function delete($path) {
-    if (strstr($path, ".")) {
-      die('nicetry.gif');
-    }
+    $path = self::sanitize_path($path);
 
-    $path = dirname(__FILE__)."/".$path . "/*";
+    $filelist = self::get_all_files($path);
 
-    $dirs = glob($path); // get all file names
-
-    foreach($dirs as $dir){ // iterate dirs
-      $files = glob($dir."/*");
-      foreach ($files as $file) {
-        if(is_file($file)) {
-          //unlink($file); // delete file
-        }
+    foreach ($filelist as $file) {
+      if (!unlink($file)) {
+        $path = 'Failed to unlink file: '.$file;
+        break;
       }
     }
 
-    echo json_encode($path);
+    return json_encode($path);
   }
 
   public static function get_directory_size($path){
+    $path = self::sanitize_path($path);
+    
     $bytestotal = 0;
     $count = 0;
     $path = realpath($path);

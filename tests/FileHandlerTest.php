@@ -38,11 +38,6 @@ class FileHandlerTest extends \PHPUnit_Framework_TestCase
   {
     // delete files and dirs
     foreach(self::$cameras as $camera) {
-      foreach(self::$pics as $pic) {
-        if (!unlink(self::$working_dir.'/'.$camera.'/'.$pic['name'])) {
-          throw new \RuntimeException('Failed to unlink file.');
-        }
-      }
       if (!rmdir(self::$working_dir . '/' . $camera)) {
         throw new \RuntimeException('Failed to remove camera dir.');
       }
@@ -65,7 +60,7 @@ class FileHandlerTest extends \PHPUnit_Framework_TestCase
   /**
    * @covers \coufal\PicturePlayer\FileHandler::ls_pictures
    */
-  public function test_ls_pictues_working()
+  public function test_ls_pictures_working()
   {
     // Assemble
     $a = array();
@@ -99,9 +94,10 @@ class FileHandlerTest extends \PHPUnit_Framework_TestCase
 
   /**
    * @covers \coufal\PicturePlayer\FileHandler::ls_pictures
+   * @depends test_ls_pictures_working
    * @expectedException RuntimeException
    */
-  public function test_ls_pictues_exception_working() {
+  public function test_ls_pictures_exception_working() {
     $a = FileHandler::ls_pictures('testcam01/..');
   }
 
@@ -109,9 +105,68 @@ class FileHandlerTest extends \PHPUnit_Framework_TestCase
    * @covers \coufal\PicturePlayer\FileHandler::get_directory_size
    */
   function test_get_directory_size_working() {
-    // Act
     $a[] = FileHandler::get_directory_size(self::$cameras[0]);
-    // Assert
+
     $this->assertEquals('[22,4]',$a[0]);
+  }
+
+  /**
+   * @covers \coufal\PicturePlayer\FileHandler::get_directory_size
+   * @depends test_get_directory_size_working
+   * @expectedException RuntimeException
+   */
+  function test_get_directory_size_exception_working() {
+    FileHandler::get_directory_size('testcam01/..');
+  }
+
+  /**
+   * @covers \coufal\PicturePlayer\FileHandler::delete
+   * @depends test_get_directory_size_working
+   */
+  function test_delete_working() {
+    foreach(self::$cameras as $camera) {
+      $response[] = FileHandler::delete($camera);
+    }
+
+    for($i=0; $i<count($response); ++$i) {
+      $this->assertEquals(json_encode(self::$cameras[$i]),$response[$i]);
+      $this->assertEquals('[0,0]',FileHandler::get_directory_size(self::$cameras[0]));
+    }
+  }
+
+  /**
+   * @covers \coufal\PicturePlayer\FileHandler::delete
+   * @depends test_delete_working
+   * @depends test_get_directory_size_working
+   */
+  function test_delete_sanitization_working() {
+    $patterns = ['../delsantest', '../../delsantest'];
+
+    foreach($patterns as $pattern) {
+      if (!mkdir(self::$working_dir . '/delsantest')) {
+        throw new \RuntimeException('Failed to create test dir.');
+      }
+      if (!touch(self::$working_dir . '/delsantest/empty.jpg')) {
+        throw new \RuntimeException('Failed to create test dir.');
+      }
+
+      $this->assertEquals('[0,1]',FileHandler::get_directory_size('delsantest'));
+      $response = FileHandler::delete($pattern);
+      $this->assertEquals(json_encode('delsantest'),$response);
+      $this->assertEquals('[0,0]',FileHandler::get_directory_size('delsantest'));
+
+      if (!rmdir(self::$working_dir . '/delsantest')) {
+        throw new \RuntimeException('Failed to remove test dir.');
+      }
+    }
+  }
+
+  /**
+   * @covers \coufal\PicturePlayer\FileHandler::delete
+   * @depends test_delete_working
+   * @expectedException RuntimeException
+   */
+  public function test_delete_exception_working() {
+    FileHandler::delete('testcam01/..');
   }
 }

@@ -13,7 +13,7 @@ if(isset($_GET['get'])) {
       echo coufal\PicturePlayer\FileHandler::get_directory_size($_GET['path']);
       break;
       case 'delete':
-        echo delete($_GET['path']);
+        echo coufal\PicturePlayer\FileHandler::delete($_GET['path']);
         break;
   }
 }
