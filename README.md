@@ -23,9 +23,7 @@ found in a directory in successive order at arond 10 frames per second (depends 
 ## Prerequisites
 ``PHP 5.4`` or better
 
-**Note** 
-
-You can usually enable a later version of php using yout ``htaccess`` file:
+If your webhoster is using an older version by default, you can usually enable a later version of php using your ``htaccess`` file:
 
 ``AddHandler php56-cgi .php``
 
