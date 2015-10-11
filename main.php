@@ -7,8 +7,7 @@ if(isset($_GET['get'])) {
       echo coufal\PicturePlayer\FileHandler::ls_cameras();
       break;
     case 'ls_pictures':
-      echo coufal\PicturePlayer\FileHandler::ls_pictures( $_SERVER[REQUEST_URI],
-                                                          $_GET['path']);
+      echo coufal\PicturePlayer\FileHandler::ls_pictures($_GET['path']);
       break;
     case 'get_directory_size':
       echo coufal\PicturePlayer\FileHandler::get_directory_size($_GET['path']);

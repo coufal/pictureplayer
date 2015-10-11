@@ -23,9 +23,12 @@ class FileHandler
     return json_encode($dirs);
   }
 
-  public static function ls_pictures($uri, $dir) {
+  public static function ls_pictures($dir) {
     //sanitize user input
-    $dir = dirname($uri) . '/' . basename($dir);
+    $dir = basename($dir);
+    if(strcmp($dir[0], '.') == 0) {
+      throw new \RuntimeException('Path must not end or begin with a dot.');
+    }
 
     //prevent errors if no timezone was set
     date_default_timezone_set('UTC');
@@ -35,18 +38,31 @@ class FileHandler
     $k = 0;
     //$filelist = glob($dir."*.jpg"); // only for full path incl date dir
 
-    $filelist = glob($dir."/*/*.jpg");
-    // try different directory structure
+
+    //$filelist = glob($dir."/*/*.jpg");
+    /*/ try different directory structure
     if (!$filelist) {
       $filelist = glob($dir."/*.jpg");
     }
+    */
+
+    $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
+    $filelist = array();
+    foreach ($rii as $file) {
+        if ($file->isDir()){
+            continue;
+        }
+        $k = ['display_name' => $file->getPathname(),
+              'name' => $file->getPathname()];
+        $filelist[] = $k;
+    }
 
     // sort by time, oldest firsts
-    usort($filelist, create_function('$a,$b', 'return filemtime($a) - filemtime($b);'));
+    usort($filelist, create_function('$a,$b', 'return filemtime($a["name"]) - filemtime($b["name"]);'));
 
     while ($i < count($filelist)) {
-      $a[$i]["name"] = $filelist[$i];
-      $a[$i]["timestamp"] = date("Y-m-d H:i:s", filemtime($filelist[$i]));
+      $a[$i]["name"] = $filelist[$i]["display_name"];
+      $a[$i]["timestamp"] = date("Y-m-d H:i:s", filemtime($filelist[$i]["name"]));
       ++$i;
 
     }
