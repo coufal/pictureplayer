@@ -14,3 +14,7 @@ input[type="text"] {
 #img, #img-loading {
   margin-bottom: 25px;
 }
+
+.right {
+  text-align: right;
+}

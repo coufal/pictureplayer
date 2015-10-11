@@ -53,7 +53,7 @@ function switchDir(myCam) {
   // }
 
   $.getJSON( url, function( data ) {
-    fileList = (data[0].name == null) ? [] : data ;
+    fileList = (data[0] == null) ? [] : data ;
     frame = 0;
     updateStatusBar(true);
     //$("#filecount").text(fileList.length+" Files");
@@ -120,20 +120,6 @@ function updateStatusBar(init) {
   }
 }
 
-// function play() {
-//   if (!stopped && frame < fileList.length) {
-//     if (reverse) {
-//       displayPic(fileList[fileList.length-1-frame]);
-//       updateStatusBar();
-//     } else {
-//       displayPic(fileList[frame]);
-//       updateStatusBar();
-//     }
-//     ++frame;
-//     setTimeout(play, delay);
-//   }
-// }
-
 function play() {
   if (!stopped && frame < fileList.length) {
     var pic = "";
@@ -191,8 +177,6 @@ function frwdBtn() {
 }
 
 function reloadBtn() {
-
-
   switchDir(cam);
   stopped = true;
   updateStatusBar(true);
@@ -200,15 +184,19 @@ function reloadBtn() {
 
 function updateCameraList() {
   $.getJSON( 'main.php?get=ls_cameras', function( data ) {
+    if (data.length == 0) {
+      console.log('No Cameras found.');
+      $("#img-loading").hide();
+      return;
+    }
+
     $("#cameralist").empty().append(function() {
         var output = '';
-        $.each(data, function(key, value) {
-            output += '<option>' + value + '</option>';
-        });
+        for(var i=0; i<data.length; ++i){
+          output += '<option>' + data[i] + '</option>';
+        }
         return output;
     });
-  })
-  .done(function() {
     onCamChange();
   })
   .fail(function() {
@@ -223,6 +211,11 @@ function onCamChange() {
 
 $(function() {
   updateCameraList();
+
+  //show version number
+  $.get( 'main.php?get=get_version', function( data ) {
+    $('#version').text(data);
+  });
 
   //$("#pps").attr("value", pps);
   //$("#t").attr("value", t);
@@ -254,9 +247,15 @@ $(function() {
 
   $("#deletebtn").click(function() {
     $.getJSON( 'main.php?get=delete&path='+cam, function( data ) {
-      $("#msg").html('<br><br><div class="alert alert-success" role="alert">\
-        <b>Deletion successful!</b> All files in <em>'+data+'</em> removed. \
-        Please refresh page!</div>');
+      if(cam.localeCompare(data) == 0) {
+        $("#img").hide();
+        updateStatusBar();
+        $("#msg").html('<br><br><div class="alert alert-success" role="alert">\
+          <b>Success!</b> All files in <em>'+data+'</em> were removed.</div>');
+      } else {
+        $("#msg").html('<br><br><div class="alert alert-danger" role="alert">\
+          <b>Error!</b> '+data+'.</div>');
+      }
     })
   });
 });
