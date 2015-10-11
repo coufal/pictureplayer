@@ -50,8 +50,8 @@ If you find any bugs or have recommendations (either regarding code or features)
 
 Usage is pretty straight forward. There are only 2 things to look out for:
 
-1. If you want to jump to a frame, you have to hit pause first.
-2. If you want to jump to a switch between normal and reverse playback, you have to click on the reload button 
+1. If you want to directly jump to a frame, you have to hit pause first.
+2. If you want switch between normal and reverse playback, you have to click on the reload button 
 for the changes to take effect.
 
 ## License
