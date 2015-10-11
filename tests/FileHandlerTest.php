@@ -14,17 +14,6 @@ class FileHandlerTest extends \PHPUnit_Framework_TestCase
 
   public static function setUpBeforeClass()
   {
-    // execute tests in temporary working dir
-    /*
-    if (!mkdir(self::$working_dir)) {
-      throw new \RuntimeException('Failed to create $working_dir.');
-    }
-    if (!copy(__DIR__.'/../FileHandler.php',
-    self::$working_dir.'/FileHandler.php')) {
-      throw new \RuntimeException('Failed to create tmp FileHandler copy.');
-    }
-    */
-
     require_once(self::$working_dir.'/FileHandler.php');
 
     // create camera dirs and fill with images
@@ -33,10 +22,13 @@ class FileHandlerTest extends \PHPUnit_Framework_TestCase
         throw new \RuntimeException('Failed to create camera dir.');
       }
       foreach(self::$pics as $pic) {
-        if (!touch(self::$working_dir.'/'.$camera.'/'.$pic['name'],
+        if (false === file_put_contents(self::$working_dir.'/'.$camera.'/'.$pic['name'],
+                                        $pic['name'])
+        || !touch(self::$working_dir.'/'.$camera.'/'.$pic['name'],
                   $pic['timestamp'])) {
           throw new \RuntimeException('Failed to create file.');
         }
+        ;
       }
     }
     //throw new \RuntimeException('Failed to create file.');
@@ -55,15 +47,6 @@ class FileHandlerTest extends \PHPUnit_Framework_TestCase
         throw new \RuntimeException('Failed to remove camera dir.');
       }
     }
-
-    /*
-    if (!unlink(self::$working_dir.'/FileHandler.php')) {
-      throw new \RuntimeException('Failed to unlink tmp FileHandler copy');
-    }
-    if (!rmdir(self::$working_dir)) {
-      throw new \RuntimeException('Failed to remove working_dir.');
-    }
-    */
   }
 
   /**
@@ -80,33 +63,13 @@ class FileHandlerTest extends \PHPUnit_Framework_TestCase
   }
 
   /**
-   * @covers \coufal\PicturePlayer\FileHandler::ls_cameras
-   * @depends test_ls_cameras_working
-   */
-  // public function test_ls_cameras_exclude_dirs_working()
-  // {
-  //   // Arrange
-  //   mkdir(self::$working_dir . '/tests');
-  //   mkdir(self::$working_dir . '/tests2');
-  //
-  //   // Act
-  //   $a = FileHandler::ls_cameras();
-  //
-  //   // Assert
-  //   $expected = '["TestCam02","testcam 3","testcam01","tests2"]';
-  //   $this->assertEquals($expected, $a);
-  //
-  //   // Cleanup
-  //   rmdir(self::$working_dir . '/tests');
-  //   rmdir(self::$working_dir . '/tests2');
-  // }
-
-  /**
    * @covers \coufal\PicturePlayer\FileHandler::ls_pictures
    */
   public function test_ls_pictues_working()
   {
     // Assemble
+    $a = array();
+    $patterns = ['../testcam01', '../../testcam01'];
     $formatted = '[{"name":"testcam01\/4.jpg",'.
                     '"timestamp":"2015-08-25 13:58:44"},'.
                   '{"name":"testcam01\/3.jpg",'.
@@ -118,44 +81,37 @@ class FileHandlerTest extends \PHPUnit_Framework_TestCase
 
     // Act
     foreach(self::$cameras as $camera) {
-      $a[] = FileHandler::ls_pictures($camera);
+      $normal[] = FileHandler::ls_pictures($camera);
+    }
+    foreach($patterns as $pattern) {
+      $malicious[] = FileHandler::ls_pictures($pattern);
     }
 
     // Assert
-    for($i=0;$i<count($a); ++$i) {
+    for($i=0;$i<count($normal); ++$i) {
       $expected = str_replace('testcam01', self::$cameras[$i], $formatted);
-      $this->assertEquals($expected, $a[$i]);
+      $this->assertEquals($expected, $normal[$i]);
+    }
+    for($i=0;$i<count($malicious); ++$i) {
+      $this->assertEquals($formatted, $malicious[$i]);
     }
   }
 
   /**
    * @covers \coufal\PicturePlayer\FileHandler::ls_pictures
-   * @depends test_ls_pictues_working
    * @expectedException RuntimeException
    */
-  public function test_ls_pictues_input_sanitation_working()
-  {
-    // Assemble
-    $formatted = '[{"name":"testcam01\/4.jpg",'.
-                    '"timestamp":"2015-08-25 13:58:44"},'.
-                  '{"name":"testcam01\/3.jpg",'.
-                    '"timestamp":"2015-09-17 17:30:24"},'.
-                  '{"name":"testcam01\/2 3.jpg",'.
-                    '"timestamp":"2015-10-10 21:05:24"},'.
-                  '{"name":"testcam01\/5.jpg",'.
-                    '"timestamp":"2015-10-13 15:45:24"}]';
+  public function test_ls_pictues_exception_working() {
+    $a = FileHandler::ls_pictures('testcam01/..');
+  }
 
+  /**
+   * @covers \coufal\PicturePlayer\FileHandler::get_directory_size
+   */
+  function test_get_directory_size_working() {
     // Act
-    foreach(self::$cameras as $camera) {
-      $a[] = FileHandler::ls_pictures('../'.$camera);
-      $b[] = FileHandler::ls_pictures($camera.'/../');
-    }
-
+    $a[] = FileHandler::get_directory_size(self::$cameras[0]);
     // Assert
-    for($i=0;$i<count($a); ++$i) {
-      $expected = str_replace('testcam01', self::$cameras[$i], $formatted);
-      $this->assertEquals($expected, $a[$i]);
-      $this->assertEquals($expected, $b[$i]);
-    }
+    $this->assertEquals('[22,4]',$a[0]);
   }
 }

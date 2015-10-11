@@ -36,15 +36,6 @@ class FileHandler
     $a = array();
     $i = 0;
     $k = 0;
-    //$filelist = glob($dir."*.jpg"); // only for full path incl date dir
-
-
-    //$filelist = glob($dir."/*/*.jpg");
-    /*/ try different directory structure
-    if (!$filelist) {
-      $filelist = glob($dir."/*.jpg");
-    }
-    */
 
     $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
     $filelist = array();
