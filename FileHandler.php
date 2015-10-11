@@ -79,13 +79,13 @@ class FileHandler
         break;
       }
     }
-
+    
     return json_encode($path);
   }
 
   public static function get_directory_size($path){
     $path = self::sanitize_path($path);
-    
+
     $bytestotal = 0;
     $count = 0;
     $path = realpath($path);

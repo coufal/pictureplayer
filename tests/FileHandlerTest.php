@@ -31,7 +31,6 @@ class FileHandlerTest extends \PHPUnit_Framework_TestCase
         ;
       }
     }
-    //throw new \RuntimeException('Failed to create file.');
   }
 
   public static function tearDownAfterClass()

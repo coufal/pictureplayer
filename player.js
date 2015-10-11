@@ -242,9 +242,15 @@ $(function() {
 
   $("#deletebtn").click(function() {
     $.getJSON( 'main.php?get=delete&path='+cam, function( data ) {
-      $("#msg").html('<br><br><div class="alert alert-success" role="alert">\
-        <b>Deletion successful!</b> All files in <em>'+data+'</em> removed. \
-        Please refresh page!</div>');
+      if(cam.localeCompare(data) == 0) {
+        $("#img").hide();
+        updateStatusBar();
+        $("#msg").html('<br><br><div class="alert alert-success" role="alert">\
+          <b>Success!</b> All files in <em>'+data+'</em> were removed.</div>');
+      } else {
+        $("#msg").html('<br><br><div class="alert alert-danger" role="alert">\
+          <b>Error!</b> '+data+'.</div>');
+      }
     })
   });
 });
