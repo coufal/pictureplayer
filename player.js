@@ -212,6 +212,11 @@ function onCamChange() {
 $(function() {
   updateCameraList();
 
+  //show version number
+  $.get( 'main.php?get=get_version', function( data ) {
+    $('#version').text(data);
+  });
+
   //$("#pps").attr("value", pps);
   //$("#t").attr("value", t);
 
